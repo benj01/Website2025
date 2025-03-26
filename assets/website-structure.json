@@ -1,0 +1,24 @@
+{
+  "elements": [
+    {
+      "type": "text",
+      "content": "Welcome",
+      "position": { "x": 400, "y": 100 }
+    },
+    {
+      "type": "text",
+      "content": "to the",
+      "position": { "x": 400, "y": 150 }
+    },
+    {
+      "type": "text",
+      "content": "Interactive",
+      "position": { "x": 400, "y": 200 }
+    },
+    {
+      "type": "text",
+      "content": "Website",
+      "position": { "x": 400, "y": 250 }
+    }
+  ]
+} 
