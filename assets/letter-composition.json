@@ -1,5 +1,109 @@
 {
-  "L": {
+  "A": {
+    "parts": [
+      {
+        "id": "left",
+        "shape": "rectangle",
+        "size": {
+          "width": 10,
+          "height": 50
+        },
+        "position": {
+          "x": 5,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "right",
+        "shape": "rectangle",
+        "size": {
+          "width": 10,
+          "height": 50
+        },
+        "position": {
+          "x": 35,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "crossbar",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 30
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      }
+    ],
+    "joints": [
+      {
+        "type": "revolute",
+        "between": ["left", "crossbar"],
+        "anchor": {
+          "x": 5,
+          "y": 30
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["right", "crossbar"],
+        "anchor": {
+          "x": 35,
+          "y": 30
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      }
+    ],
+    "metadata": {
+      "width": 40,
+      "height": 50,
+      "baseline": 45
+    }
+  },
+  "B": {
     "parts": [
       {
         "id": "vertical",
@@ -23,7 +127,49 @@
         "contactForceEventThreshold": 10
       },
       {
-        "id": "horizontal",
+        "id": "top",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 5
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "middle",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "bottom",
         "shape": "rectangle",
         "size": {
           "width": 30,
@@ -47,7 +193,37 @@
     "joints": [
       {
         "type": "revolute",
-        "between": ["vertical", "horizontal"],
+        "between": ["vertical", "top"],
+        "anchor": {
+          "x": 5,
+          "y": 5
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["vertical", "middle"],
+        "anchor": {
+          "x": 5,
+          "y": 25
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["vertical", "bottom"],
         "anchor": {
           "x": 5,
           "y": 45
@@ -64,22 +240,1013 @@
     "metadata": {
       "width": 40,
       "height": 50,
-      "baseline": 45,
-      "description": {
-        "width": "Total width of the letter",
-        "height": "Total height of the letter",
-        "baseline": "Distance from top where the letter sits on the line",
-        "breakForce": "Force required to break the joint",
-        "collideConnected": "Whether the connected bodies should collide",
-        "limits": "Angular limits for revolute joints in radians (-45 to +45 degrees)",
-        "restitution": "Bounciness of the parts (0.0 to 1.0)",
-        "restitutionCombineRule": "How to combine restitution values when objects collide",
-        "friction": "Surface friction of the parts (0.0 to 1.0)",
-        "frictionCombineRule": "How to combine friction values when objects collide",
-        "enableCollisionEvents": "Whether to enable collision event detection",
-        "enableContactForceEvents": "Whether to enable contact force event detection",
-        "contactForceEventThreshold": "Minimum force required to trigger a contact force event"
+      "baseline": 45
+    }
+  },
+  "C": {
+    "parts": [
+      {
+        "id": "left",
+        "shape": "rectangle",
+        "size": {
+          "width": 10,
+          "height": 50
+        },
+        "position": {
+          "x": 5,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "top",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 5
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "bottom",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 45
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
       }
+    ],
+    "joints": [
+      {
+        "type": "revolute",
+        "between": ["left", "top"],
+        "anchor": {
+          "x": 5,
+          "y": 5
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["left", "bottom"],
+        "anchor": {
+          "x": 5,
+          "y": 45
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      }
+    ],
+    "metadata": {
+      "width": 40,
+      "height": 50,
+      "baseline": 45
+    }
+  },
+  "D": {
+    "parts": [
+      {
+        "id": "vertical",
+        "shape": "rectangle",
+        "size": {
+          "width": 10,
+          "height": 50
+        },
+        "position": {
+          "x": 5,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "top",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 5
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "bottom",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 45
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "curve",
+        "shape": "rectangle",
+        "size": {
+          "width": 10,
+          "height": 30
+        },
+        "position": {
+          "x": 35,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      }
+    ],
+    "joints": [
+      {
+        "type": "revolute",
+        "between": ["vertical", "top"],
+        "anchor": {
+          "x": 5,
+          "y": 5
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["vertical", "bottom"],
+        "anchor": {
+          "x": 5,
+          "y": 45
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["curve", "top"],
+        "anchor": {
+          "x": 35,
+          "y": 5
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["curve", "bottom"],
+        "anchor": {
+          "x": 35,
+          "y": 45
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      }
+    ],
+    "metadata": {
+      "width": 40,
+      "height": 50,
+      "baseline": 45
+    }
+  },
+  "E": {
+    "parts": [
+      {
+        "id": "vertical",
+        "shape": "rectangle",
+        "size": {
+          "width": 10,
+          "height": 50
+        },
+        "position": {
+          "x": 5,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "top",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 5
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "middle",
+        "shape": "rectangle",
+        "size": {
+          "width": 20,
+          "height": 10
+        },
+        "position": {
+          "x": 15,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "bottom",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 45
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      }
+    ],
+    "joints": [
+      {
+        "type": "revolute",
+        "between": ["vertical", "top"],
+        "anchor": {
+          "x": 5,
+          "y": 5
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["vertical", "middle"],
+        "anchor": {
+          "x": 5,
+          "y": 25
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["vertical", "bottom"],
+        "anchor": {
+          "x": 5,
+          "y": 45
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      }
+    ],
+    "metadata": {
+      "width": 40,
+      "height": 50,
+      "baseline": 45
+    }
+  },
+  "F": {
+    "parts": [
+      {
+        "id": "vertical",
+        "shape": "rectangle",
+        "size": {
+          "width": 10,
+          "height": 50
+        },
+        "position": {
+          "x": 5,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "top",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 5
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "middle",
+        "shape": "rectangle",
+        "size": {
+          "width": 20,
+          "height": 10
+        },
+        "position": {
+          "x": 15,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      }
+    ],
+    "joints": [
+      {
+        "type": "revolute",
+        "between": ["vertical", "top"],
+        "anchor": {
+          "x": 5,
+          "y": 5
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["vertical", "middle"],
+        "anchor": {
+          "x": 5,
+          "y": 25
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      }
+    ],
+    "metadata": {
+      "width": 40,
+      "height": 50,
+      "baseline": 45
+    }
+  },
+  "G": {
+    "parts": [
+      {
+        "id": "left",
+        "shape": "rectangle",
+        "size": {
+          "width": 10,
+          "height": 50
+        },
+        "position": {
+          "x": 5,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "top",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 5
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "bottom",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 45
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "right",
+        "shape": "rectangle",
+        "size": {
+          "width": 10,
+          "height": 30
+        },
+        "position": {
+          "x": 35,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "hook",
+        "shape": "rectangle",
+        "size": {
+          "width": 20,
+          "height": 10
+        },
+        "position": {
+          "x": 35,
+          "y": 35
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      }
+    ],
+    "joints": [
+      {
+        "type": "revolute",
+        "between": ["left", "top"],
+        "anchor": {
+          "x": 5,
+          "y": 5
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["left", "bottom"],
+        "anchor": {
+          "x": 5,
+          "y": 45
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["right", "top"],
+        "anchor": {
+          "x": 35,
+          "y": 5
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["right", "bottom"],
+        "anchor": {
+          "x": 35,
+          "y": 45
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["right", "hook"],
+        "anchor": {
+          "x": 35,
+          "y": 35
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      }
+    ],
+    "metadata": {
+      "width": 40,
+      "height": 50,
+      "baseline": 45
+    }
+  },
+  "H": {
+    "parts": [
+      {
+        "id": "left",
+        "shape": "rectangle",
+        "size": {
+          "width": 10,
+          "height": 50
+        },
+        "position": {
+          "x": 5,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "right",
+        "shape": "rectangle",
+        "size": {
+          "width": 10,
+          "height": 50
+        },
+        "position": {
+          "x": 35,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "middle",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      }
+    ],
+    "joints": [
+      {
+        "type": "revolute",
+        "between": ["left", "middle"],
+        "anchor": {
+          "x": 5,
+          "y": 25
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["right", "middle"],
+        "anchor": {
+          "x": 35,
+          "y": 25
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      }
+    ],
+    "metadata": {
+      "width": 40,
+      "height": 50,
+      "baseline": 45
+    }
+  },
+  "I": {
+    "parts": [
+      {
+        "id": "vertical",
+        "shape": "rectangle",
+        "size": {
+          "width": 10,
+          "height": 50
+        },
+        "position": {
+          "x": 5,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "top",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 5
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "bottom",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 45
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      }
+    ],
+    "joints": [
+      {
+        "type": "revolute",
+        "between": ["vertical", "top"],
+        "anchor": {
+          "x": 5,
+          "y": 5
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["vertical", "bottom"],
+        "anchor": {
+          "x": 5,
+          "y": 45
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      }
+    ],
+    "metadata": {
+      "width": 40,
+      "height": 50,
+      "baseline": 45
+    }
+  },
+  "J": {
+    "parts": [
+      {
+        "id": "vertical",
+        "shape": "rectangle",
+        "size": {
+          "width": 10,
+          "height": 50
+        },
+        "position": {
+          "x": 5,
+          "y": 25
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "top",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 20,
+          "y": 5
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      },
+      {
+        "id": "hook",
+        "shape": "rectangle",
+        "size": {
+          "width": 20,
+          "height": 10
+        },
+        "position": {
+          "x": 15,
+          "y": 45
+        },
+        "type": "dynamic",
+        "color": "0xcccccc",
+        "restitution": 0.2,
+        "restitutionCombineRule": "min",
+        "friction": 1.0,
+        "frictionCombineRule": "max",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
+      }
+    ],
+    "joints": [
+      {
+        "type": "revolute",
+        "between": ["vertical", "top"],
+        "anchor": {
+          "x": 5,
+          "y": 5
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      },
+      {
+        "type": "revolute",
+        "between": ["vertical", "hook"],
+        "anchor": {
+          "x": 5,
+          "y": 45
+        },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      }
+    ],
+    "metadata": {
+      "width": 40,
+      "height": 50,
+      "baseline": 45
     }
   }
 } 

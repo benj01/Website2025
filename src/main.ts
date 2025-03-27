@@ -66,9 +66,9 @@ async function init() {
     // Create ground
     objectManager.createObject({
       type: PhysicsObjectType.STATIC,
-      position: { x: 300, y: 500 },  // Centered horizontally
+      position: { x: window.innerWidth / 2, y: window.innerHeight - 50 },  // Centered horizontally, near bottom
       shape: 'rectangle',
-      size: { width: 600, height: 10 },  // Slightly smaller width
+      size: { width: window.innerWidth, height: 10 },  // Full screen width
       friction: 3.0,
       frictionCombineRule: 'max',
       restitution: 0.0,
@@ -77,10 +77,33 @@ async function init() {
       enableContactForceEvents: false
     });
 
-    // Create letter L
-    console.log('Creating letter L...');
-    const letterParts = letterLoader.createLetter('L', { x: 300, y: 100 });  // Centered horizontally
-    console.log('Letter parts created:', letterParts);
+    // Create letters sequentially
+    const letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+    let letterIndex = 0;
+
+    // Function to create next letter
+    function createNextLetter() {
+      if (letterIndex < letters.length) {
+        const letter = letters[letterIndex];
+        console.log(`Creating letter ${letter}...`);
+        
+        // Calculate center position, accounting for letter width
+        const letterWidth = 40; // Width from metadata
+        const x = (window.innerWidth - letterWidth) / 2; // Center horizontally
+        const y = 100; // Start from top
+        
+        letterLoader.createLetter(letter, { x, y });
+        letterIndex++;
+        
+        // Schedule next letter
+        if (letterIndex < letters.length) {
+          setTimeout(createNextLetter, 1000); // 1 second interval
+        }
+      }
+    }
+
+    // Start creating letters
+    createNextLetter();
 
     // Track last update time for fixed timestep
     let lastTime = performance.now();
@@ -97,13 +120,13 @@ async function init() {
       accumulator += deltaTime;
       
       while (accumulator >= fixedTimeStep) {
-        physics.step(fixedTimeStep, maxSubSteps);
+        physics.step(fixedTimeStep);
+        // Update visual objects based on physics state
+        objectManager.sync();
         accumulator -= fixedTimeStep;
       }
 
-      // Update visual representations
-      objectManager.sync();
-
+      // Request next frame
       requestAnimationFrame(gameLoop);
     }
 

@@ -1,5 +1,17 @@
 # Physics Implementation Notes
 
+## Physics World Configuration
+
+### Gravity and Time Steps
+- Gravity: 980.0 units/s² (equivalent to 9.8 m/s² * 100 for pixel scale)
+- Physics update rate: 120Hz (fixedTimeStep = 1/120)
+- Max substeps: 4 per frame
+- Delta time capped at 100ms to prevent instability
+
+### Damping Settings
+- Linear damping: 0.1 (for natural sliding motion)
+- Angular damping: 0.8 (to reduce wobbling)
+
 ## Joint System
 
 ### Revolute Joints
@@ -10,9 +22,9 @@ Revolute joints allow rotation around a fixed point between two bodies. Key aspe
    - World space coordinates must be converted to local space for each body
    - Example conversion:
    ```typescript
-   const localAnchor = new Vector2(
-     worldAnchor.x - bodyPosition.x,
-     worldAnchor.y - bodyPosition.y
+   const anchor1 = new this.RAPIER.Vector2(
+     params.anchor.x - bodyAPos.x,
+     params.anchor.y - bodyAPos.y
    );
    ```
 
@@ -25,90 +37,73 @@ Revolute joints allow rotation around a fixed point between two bodies. Key aspe
      - Joint anchor: (5, 45)
 
 3. **Angle Limits**
-   - Can restrict rotation range using `limitsEnabled` and `limits`
-   - Angles specified in radians
-   - Example: -45° to +45° degrees
-   ```json
-   "limits": {
-     "enabled": true,
-     "min": -0.785398,  // -45 degrees
-     "max": 0.785398    // +45 degrees
-   }
+   - Using `limitsEnabled` and `limits`
+   - Current limits: ±22.5 degrees (±π/8 radians)
+   ```typescript
+   const minAngle = -Math.PI / 8;
+   const maxAngle = Math.PI / 8;
+   jointData.limitsEnabled = true;
+   jointData.limits = [minAngle, maxAngle];
    ```
 
 4. **Collision Behavior**
    - `collideConnected`: Controls whether joined bodies can collide
-   - `false`: Bodies pass through each other (useful for connected parts)
+   - `false`: Bodies pass through each other (used for letter parts)
    - `true`: Bodies collide like separate objects
 
-### Letter Composition
+## Collision System
 
-1. **Part Definition**
-   ```json
-   {
-     "id": "vertical",
-     "shape": "rectangle",
-     "size": {
-       "width": 10,
-       "height": 50
-     },
-     "position": {
-       "x": 5,
-       "y": 25
-     },
-     "type": "dynamic"
-   }
-   ```
+### Event Handling
+- Collision events enabled via `enableCollisionEvents`
+- Using EventQueue for collision detection
+- Tracking unique collision pairs to prevent duplicate logging
+- Example collision pair key: "1-2" (sorted object IDs)
 
-2. **Joint Definition**
-   ```json
-   {
-     "type": "revolute",
-     "between": ["vertical", "horizontal"],
-     "anchor": {
-       "x": 5,
-       "y": 45
-     },
-     "breakForce": 1000,
-     "collideConnected": false
-   }
-   ```
+### Ground Configuration
+- Static body
+- Position: (300, 500)
+- Size: 600x10 units
+- Friction: 3.0
+- Restitution: 0.0
+- Using 'max' friction combine rule
+- Using 'min' restitution combine rule
 
-### Body Handles in Rapier.js
-Rapier.js uses a handle system to reference physics bodies and other objects:
+## Letter Configuration
 
-1. **Handle Format**
-   - Handles appear as very small scientific notation numbers (e.g., `1e-323`)
-   - These are internal memory references, not physical properties
-   - Example log: `Bodies found for joint: {bodyA: 1e-323, bodyB: 1.5e-323}`
+### Physics Properties
+- Dynamic bodies
+- Continuous Collision Detection (CCD) enabled
+- Restitution: 0.2
+- Friction: 1.0
+- Using 'min' restitution combine rule
+- Using 'max' friction combine rule
 
-2. **Understanding Handles**
-   - Handles are WebAssembly memory references
-   - They uniquely identify objects in the physics world
-   - Don't confuse these with physical properties like position or mass
-   - These values are normal and expected in debug logs
-
-3. **Best Practices**
-   - Store handles when creating bodies for later reference
-   - Use handles when querying body states or applying forces
-   - Don't try to interpret handle values - they're internal identifiers
+### Joint Properties
+- Revolute joint with ±22.5° limits
+- Break force: 1000
+- Non-colliding connected parts
+- Local space anchor calculations
 
 ## Best Practices
 
 1. **Position Calculations**
-   - Always consider the center point of bodies when positioning
-   - Account for body dimensions when placing joints
    - Use local space for joint anchors
+   - Center objects horizontally (x: 300)
+   - Place ground lower in scene (y: 500)
+   - Start letters higher up (y: 100)
 
 2. **Physics Parameters**
-   - Use appropriate break forces (e.g., 1000 for stable connections)
-   - Set reasonable angle limits for natural movement
-   - Consider collision flags based on desired behavior
+   - High ground friction (3.0) for stability
+   - Zero ground restitution to prevent bouncing
+   - Moderate letter friction (1.0) for natural movement
+   - High angular damping (0.8) to prevent wobbling
+   - Low linear damping (0.1) for natural motion
 
-3. **Debugging**
-   - Log body positions and local anchors
-   - Visualize joint connections and anchor points
-   - Monitor joint forces and angles during simulation
+3. **Performance**
+   - Using fixed timestep (1/120s)
+   - Maximum 4 substeps per frame
+   - Delta time capping at 100ms
+   - Efficient collision pair tracking
 
 ## Common Issues and Solutions
 

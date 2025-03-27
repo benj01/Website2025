@@ -40,19 +40,13 @@ export class Renderer {
     document.body.appendChild(this.app.canvas);
     console.log('[Renderer] Canvas added to DOM');
 
-    // Center the stage
-    this.app.stage.position.set(window.innerWidth / 2, window.innerHeight / 2);
-    console.log('[Renderer] Stage centered at:', {
-      x: window.innerWidth / 2,
-      y: window.innerHeight / 2
-    });
+    // Don't center the stage, as we want to use screen coordinates directly
+    // this.app.stage.position.set(window.innerWidth / 2, window.innerHeight / 2);
 
     // Handle window resize
     window.addEventListener('resize', () => {
       this.app.renderer.resize(window.innerWidth, window.innerHeight);
-      // Update stage position on resize
-      this.app.stage.position.set(window.innerWidth / 2, window.innerHeight / 2);
-      console.log('[Renderer] Window resized, stage repositioned');
+      console.log('[Renderer] Window resized');
     });
   }
 

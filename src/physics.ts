@@ -121,8 +121,8 @@ export class PhysicsWorld {
       default:
         rigidBodyDesc = this.RAPIER.RigidBodyDesc.dynamic();
         // Add damping to reduce energy over time
-        rigidBodyDesc.setLinearDamping(0.1);  // Reduced linear damping for more natural motion
-        rigidBodyDesc.setAngularDamping(0.8); // Keep high angular damping to reduce wobbling
+        rigidBodyDesc.setLinearDamping(0.3);  // Increased linear damping for more stability
+        rigidBodyDesc.setAngularDamping(1.2); // Increased angular damping to reduce wobbling
         break;
     }
 
@@ -290,11 +290,16 @@ export class PhysicsWorld {
           // Create revolute joint with the local anchors
           jointData = this.RAPIER.JointData.revolute(anchor1, anchor2);
           
-          // Set angle limits (in radians)
+          // Set angle limits (in radians) and damping
           const minAngle = -Math.PI / 8;  // -22.5 degrees
           const maxAngle = Math.PI / 8;   // +22.5 degrees
           jointData.limitsEnabled = true;
           jointData.limits = [minAngle, maxAngle];
+          
+          // Add joint damping and stiffness
+          jointData.damping = 10.0;        // Add significant damping to joints
+          jointData.stiffness = 50.0;      // Make joints stiffer
+          jointData.restitution = 0.0;     // No bouncing at joint limits
           
           break;
         case 'prismatic':
