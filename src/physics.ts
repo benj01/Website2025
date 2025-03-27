@@ -9,6 +9,13 @@ export interface PhysicsObjectParams {
   position: { x: number; y: number };
   shape?: 'circle' | 'rectangle';
   size?: { width: number; height: number } | { radius: number };
+  restitution?: number;  // Bounciness (0.0 to 1.0)
+  restitutionCombineRule?: 'average' | 'min' | 'max' | 'multiply';
+  friction?: number;  // Surface friction (0.0 to 1.0)
+  frictionCombineRule?: 'average' | 'min' | 'max' | 'multiply';
+  contactForceEventThreshold?: number;  // Minimum force required to trigger contact events
+  enableCollisionEvents?: boolean;      // Whether to enable collision events
+  enableContactForceEvents?: boolean;   // Whether to enable contact force events
 }
 
 export interface JointParams {
@@ -27,6 +34,7 @@ export class PhysicsWorld {
   private joints: Map<number, any>;
   private nextObjectId: number;
   private nextJointId: number;
+  private eventQueue: any;  // RAPIER.EventQueue
 
   constructor() {
     console.log('PhysicsWorld constructor called');
@@ -47,6 +55,9 @@ export class PhysicsWorld {
           version: this.RAPIER.version(),
           available: Object.keys(this.RAPIER)
         });
+
+        // Initialize event queue
+        this.eventQueue = new this.RAPIER.EventQueue(true);
 
         // Log available joint-related classes
         console.log('Joint APIs available:', {
@@ -116,6 +127,9 @@ export class PhysicsWorld {
       case 'dynamic':
       default:
         rigidBodyDesc = this.RAPIER.RigidBodyDesc.dynamic();
+        // Add damping to reduce energy over time
+        rigidBodyDesc.setLinearDamping(0.3);  // Controls sliding friction
+        rigidBodyDesc.setAngularDamping(0.4); // Controls rotational friction
         break;
     }
 
@@ -124,6 +138,11 @@ export class PhysicsWorld {
 
     // Create the rigid body
     const rigidBody = this.world.createRigidBody(rigidBodyDesc);
+
+    // Enable CCD for dynamic bodies
+    if (params.type === 'dynamic') {
+      rigidBody.enableCcd(true);
+    }
 
     // Create collider based on shape
     let colliderDesc;
@@ -135,7 +154,70 @@ export class PhysicsWorld {
       colliderDesc = this.RAPIER.ColliderDesc.cuboid(size.width / 2, size.height / 2);
     }
 
+    // Set restitution (bounciness) if provided
+    if (params.restitution !== undefined) {
+      colliderDesc.setRestitution(params.restitution);
+    }
+
+    // Set restitution combine rule if provided
+    if (params.restitutionCombineRule) {
+      switch (params.restitutionCombineRule) {
+        case 'average':
+          colliderDesc.setRestitutionCombineRule(this.RAPIER.CoefficientCombineRule.Average);
+          break;
+        case 'min':
+          colliderDesc.setRestitutionCombineRule(this.RAPIER.CoefficientCombineRule.Min);
+          break;
+        case 'max':
+          colliderDesc.setRestitutionCombineRule(this.RAPIER.CoefficientCombineRule.Max);
+          break;
+        case 'multiply':
+          colliderDesc.setRestitutionCombineRule(this.RAPIER.CoefficientCombineRule.Multiply);
+          break;
+      }
+    }
+
+    // Set friction if provided
+    if (params.friction !== undefined) {
+      colliderDesc.setFriction(params.friction);
+    }
+
+    // Set friction combine rule if provided
+    if (params.frictionCombineRule) {
+      switch (params.frictionCombineRule) {
+        case 'average':
+          colliderDesc.setFrictionCombineRule(this.RAPIER.CoefficientCombineRule.Average);
+          break;
+        case 'min':
+          colliderDesc.setFrictionCombineRule(this.RAPIER.CoefficientCombineRule.Min);
+          break;
+        case 'max':
+          colliderDesc.setFrictionCombineRule(this.RAPIER.CoefficientCombineRule.Max);
+          break;
+        case 'multiply':
+          colliderDesc.setFrictionCombineRule(this.RAPIER.CoefficientCombineRule.Multiply);
+          break;
+      }
+    }
+
     const collider = this.world.createCollider(colliderDesc, rigidBody);
+    
+    // Set up collision and contact force events if enabled
+    if (params.enableCollisionEvents || params.enableContactForceEvents) {
+      let activeEvents = 0;
+      if (params.enableCollisionEvents) {
+        activeEvents |= this.RAPIER.ActiveEvents.COLLISION_EVENTS;
+      }
+      if (params.enableContactForceEvents) {
+        activeEvents |= this.RAPIER.ActiveEvents.CONTACT_FORCE_EVENTS;
+      }
+      collider.setActiveEvents(activeEvents);
+
+      // Set contact force threshold if provided
+      if (params.contactForceEventThreshold !== undefined) {
+        collider.setContactForceEventThreshold(params.contactForceEventThreshold);
+      }
+    }
     
     // Store the object
     this.objects.set(id, {
@@ -312,11 +394,76 @@ export class PhysicsWorld {
   step(deltaTime: number = 1/60): void {
     if (this.world) {
       // Step the physics simulation with the given timestep
-      this.world.step();
+      this.world.step(this.eventQueue);
+
+      // Process collision events
+      this.eventQueue.drainCollisionEvents((handle1: number, handle2: number, started: boolean) => {
+        // Find the objects involved in the collision
+        const obj1 = Array.from(this.objects.entries()).find(([_, obj]) => obj.collider.handle === handle1);
+        const obj2 = Array.from(this.objects.entries()).find(([_, obj]) => obj.collider.handle === handle2);
+        
+        if (obj1 && obj2) {
+          console.log('Collision Event:', {
+            type: started ? 'started' : 'ended',
+            object1: {
+              id: obj1[0],
+              type: obj1[1].params.type,
+              position: obj1[1].rigidBody.translation()
+            },
+            object2: {
+              id: obj2[0],
+              type: obj2[1].params.type,
+              position: obj2[1].rigidBody.translation()
+            }
+          });
+        } else {
+          console.log('Collision Event with unknown objects:', {
+            handle1,
+            handle2,
+            started,
+            foundObj1: !!obj1,
+            foundObj2: !!obj2
+          });
+        }
+      });
+
+      // Process contact force events
+      this.eventQueue.drainContactForceEvents((event: any) => {
+        const handle1 = event.collider1();
+        const handle2 = event.collider2();
+        
+        // Find the objects involved in the contact
+        const obj1 = Array.from(this.objects.entries()).find(([_, obj]) => obj.collider.handle === handle1);
+        const obj2 = Array.from(this.objects.entries()).find(([_, obj]) => obj.collider.handle === handle2);
+        
+        if (obj1 && obj2) {
+          console.log('Contact Force Event:', {
+            object1: {
+              id: obj1[0],
+              type: obj1[1].params.type,
+              position: obj1[1].rigidBody.translation()
+            },
+            object2: {
+              id: obj2[0],
+              type: obj2[1].params.type,
+              position: obj2[1].rigidBody.translation()
+            },
+            totalForce: event.totalForce ? event.totalForce() : 'N/A'
+          });
+        } else {
+          console.log('Contact Force Event with unknown objects:', {
+            handle1,
+            handle2,
+            foundObj1: !!obj1,
+            foundObj2: !!obj2
+          });
+        }
+      });
+
       // Apply multiple substeps for better stability
       const numSubsteps = 1;
       for (let i = 0; i < numSubsteps; i++) {
-        this.world.step();
+        this.world.step(this.eventQueue);
       }
     }
   }

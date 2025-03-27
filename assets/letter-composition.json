@@ -13,7 +13,14 @@
           "y": 25
         },
         "type": "dynamic",
-        "color": "0xcccccc"
+        "color": "0xcccccc",
+        "restitution": 0.4,
+        "restitutionCombineRule": "average",
+        "friction": 0.5,
+        "frictionCombineRule": "average",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
       },
       {
         "id": "horizontal",
@@ -27,7 +34,14 @@
           "y": 45
         },
         "type": "dynamic",
-        "color": "0xcccccc"
+        "color": "0xcccccc",
+        "restitution": 0.4,
+        "restitutionCombineRule": "average",
+        "friction": 0.5,
+        "frictionCombineRule": "average",
+        "enableCollisionEvents": true,
+        "enableContactForceEvents": true,
+        "contactForceEventThreshold": 10
       }
     ],
     "joints": [
@@ -57,7 +71,14 @@
         "baseline": "Distance from top where the letter sits on the line",
         "breakForce": "Force required to break the joint",
         "collideConnected": "Whether the connected bodies should collide",
-        "limits": "Angular limits for revolute joints in radians (-45 to +45 degrees)"
+        "limits": "Angular limits for revolute joints in radians (-45 to +45 degrees)",
+        "restitution": "Bounciness of the parts (0.0 to 1.0)",
+        "restitutionCombineRule": "How to combine restitution values when objects collide",
+        "friction": "Surface friction of the parts (0.0 to 1.0)",
+        "frictionCombineRule": "How to combine friction values when objects collide",
+        "enableCollisionEvents": "Whether to enable collision event detection",
+        "enableContactForceEvents": "Whether to enable contact force event detection",
+        "contactForceEventThreshold": "Minimum force required to trigger a contact force event"
       }
     }
   }

@@ -26,6 +26,13 @@ export interface ObjectCreateParams {
   shape?: 'circle' | 'rectangle';
   size?: { width: number; height: number } | { radius: number };
   color?: number;
+  restitution?: number;  // Bounciness (0.0 to 1.0)
+  restitutionCombineRule?: 'average' | 'min' | 'max' | 'multiply';
+  friction?: number;  // Surface friction (0.0 to 1.0)
+  frictionCombineRule?: 'average' | 'min' | 'max' | 'multiply';
+  enableCollisionEvents?: boolean;  // Whether to enable collision events
+  enableContactForceEvents?: boolean;  // Whether to enable contact force events
+  contactForceEventThreshold?: number;  // Minimum force required to trigger contact events
 }
 
 export interface JointCreateParams {
@@ -81,7 +88,11 @@ export class ObjectManager {
       type: params.type,
       position: params.position,
       shape: params.shape,
-      size: params.size
+      size: params.size,
+      restitution: params.restitution,
+      restitutionCombineRule: params.restitutionCombineRule,
+      friction: params.friction,
+      frictionCombineRule: params.frictionCombineRule
     });
 
     // Create visual representation

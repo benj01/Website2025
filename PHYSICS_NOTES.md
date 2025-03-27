@@ -155,4 +155,29 @@ world.createImpulseJoint(jointData, bodyA, bodyB, true);
 3. **Advanced Features**
    - Motor-driven joints
    - Spring constraints
-   - Chain reactions 
+   - Chain reactions
+
+## Physics Parameters
+
+### Damping
+Damping is used to simulate energy loss in the physics system:
+
+1. **Types of Damping**
+   - `linearDamping`: Reduces sliding motion (0.0 to 1.0)
+   - `angularDamping`: Reduces rotational motion (0.0 to 1.0)
+   ```typescript
+   rigidBodyDesc.setLinearDamping(0.3);   // Moderate sliding friction
+   rigidBodyDesc.setAngularDamping(0.4);   // Moderate rotational friction
+   ```
+
+2. **Effects**
+   - Higher values (closer to 1.0) = More friction, quicker energy loss
+   - Lower values (closer to 0.0) = Less friction, objects keep moving
+   - Current settings:
+     - Linear: 0.3 (moderate sliding resistance)
+     - Angular: 0.4 (moderate rotational resistance)
+
+3. **Use Cases**
+   - Prevent infinite sliding/spinning
+   - Simulate surface friction
+   - Create more realistic object interactions 

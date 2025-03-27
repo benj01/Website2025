@@ -68,7 +68,11 @@ async function init() {
       type: PhysicsObjectType.STATIC,
       position: { x: 0, y: 100 },
       shape: 'rectangle',
-      size: { width: 800, height: 10 }
+      size: { width: 800, height: 10 },
+      friction: 1.5,  // Higher friction for the ground
+      frictionCombineRule: 'max',  // Use maximum friction when colliding
+      enableCollisionEvents: true,  // Enable collision events
+      enableContactForceEvents: true  // Enable contact force events
     });
 
     // Create letter L
