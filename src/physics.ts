@@ -168,19 +168,9 @@ export class PhysicsWorld {
     });
 
     try {
-      // Convert world space anchor to local space for each body
+      // Get body positions
       const bodyAPos = bodyA.translation();
       const bodyBPos = bodyB.translation();
-      
-      const anchor1 = new this.RAPIER.Vector2(
-        params.anchor.x - bodyAPos.x,
-        params.anchor.y - bodyAPos.y
-      );
-      
-      const anchor2 = new this.RAPIER.Vector2(
-        params.anchor.x - bodyBPos.x,
-        params.anchor.y - bodyBPos.y
-      );
 
       // Create the joint data
       let jointData;
@@ -188,25 +178,56 @@ export class PhysicsWorld {
         case 'fixed':
           console.log('Creating fixed joint at:', params.anchor);
           jointData = this.RAPIER.JointData.fixed(
-            anchor1,
+            new this.RAPIER.Vector2(0, 0),  // Use body center as anchor
             0,  // frame1
-            anchor2,
+            new this.RAPIER.Vector2(0, 0),  // Use body center as anchor
             0   // frame2
           );
           break;
         case 'revolute':
           console.log('Creating revolute joint at:', params.anchor);
-          jointData = this.RAPIER.JointData.revolute(
-            anchor1,
-            anchor2
+          
+          // Get the positions of both bodies
+          const bodyAPos = bodyA.translation();
+          const bodyBPos = bodyB.translation();
+          
+          // Calculate local space anchors relative to body centers
+          const anchor1 = new this.RAPIER.Vector2(
+            params.anchor.x - bodyAPos.x,
+            params.anchor.y - bodyAPos.y
           );
+          
+          const anchor2 = new this.RAPIER.Vector2(
+            params.anchor.x - bodyBPos.x,
+            params.anchor.y - bodyBPos.y
+          );
+          
+          console.log('Body positions:', {
+            bodyA: { x: bodyAPos.x, y: bodyAPos.y },
+            bodyB: { x: bodyBPos.x, y: bodyBPos.y }
+          });
+          
+          console.log('Local anchors:', {
+            anchor1: { x: anchor1.x, y: anchor1.y },
+            anchor2: { x: anchor2.x, y: anchor2.y }
+          });
+          
+          // Create revolute joint with the local anchors
+          jointData = this.RAPIER.JointData.revolute(anchor1, anchor2);
+          
+          // Set angle limits (in radians)
+          const minAngle = -Math.PI / 4;  // -45 degrees
+          const maxAngle = Math.PI / 4;   // +45 degrees
+          jointData.limitsEnabled = true;
+          jointData.limits = [minAngle, maxAngle];
+          
           break;
         case 'prismatic':
           console.log('Creating prismatic joint at:', params.anchor);
           const axis = new this.RAPIER.Vector2(1.0, 0.0);
           jointData = this.RAPIER.JointData.prismatic(
-            anchor1,
-            anchor2,
+            new this.RAPIER.Vector2(0, 0),
+            new this.RAPIER.Vector2(0, 0),
             axis
           );
           break;

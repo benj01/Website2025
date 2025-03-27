@@ -23,7 +23,7 @@
           "height": 10
         },
         "position": {
-          "x": 25,
+          "x": 20,
           "y": 45
         },
         "type": "dynamic",
@@ -38,6 +38,11 @@
           "x": 5,
           "y": 45
         },
+        "limits": {
+          "enabled": true,
+          "min": -0.785398,
+          "max": 0.785398
+        },
         "breakForce": 1000,
         "collideConnected": false
       }
@@ -51,7 +56,8 @@
         "height": "Total height of the letter",
         "baseline": "Distance from top where the letter sits on the line",
         "breakForce": "Force required to break the joint",
-        "collideConnected": "Whether the connected bodies should collide"
+        "collideConnected": "Whether the connected bodies should collide",
+        "limits": "Angular limits for revolute joints in radians (-45 to +45 degrees)"
       }
     }
   }
