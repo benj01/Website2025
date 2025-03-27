@@ -92,7 +92,10 @@ export class ObjectManager {
       restitution: params.restitution,
       restitutionCombineRule: params.restitutionCombineRule,
       friction: params.friction,
-      frictionCombineRule: params.frictionCombineRule
+      frictionCombineRule: params.frictionCombineRule,
+      enableCollisionEvents: params.enableCollisionEvents,
+      enableContactForceEvents: params.enableContactForceEvents,
+      contactForceEventThreshold: params.contactForceEventThreshold
     });
 
     // Create visual representation

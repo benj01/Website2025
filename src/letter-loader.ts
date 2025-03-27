@@ -13,6 +13,13 @@ interface LetterPart {
   };
   type: string;
   color: string;
+  restitution: number;
+  restitutionCombineRule: 'average' | 'min' | 'max' | 'multiply';
+  friction: number;
+  frictionCombineRule: 'average' | 'min' | 'max' | 'multiply';
+  enableCollisionEvents: boolean;
+  enableContactForceEvents: boolean;
+  contactForceEventThreshold: number;
 }
 
 interface LetterJoint {
@@ -97,7 +104,14 @@ export class LetterLoader {
         },
         shape: part.shape,
         size: part.size,
-        color: parseInt(part.color)
+        color: parseInt(part.color),
+        restitution: part.restitution,
+        restitutionCombineRule: part.restitutionCombineRule,
+        friction: part.friction,
+        frictionCombineRule: part.frictionCombineRule,
+        enableCollisionEvents: part.enableCollisionEvents,
+        enableContactForceEvents: part.enableContactForceEvents,
+        contactForceEventThreshold: part.contactForceEventThreshold
       });
       partIds.push(objectId);
       this.createdParts.set(part.id, objectId);

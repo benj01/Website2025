@@ -35,6 +35,7 @@ export class PhysicsWorld {
   private nextObjectId: number;
   private nextJointId: number;
   private eventQueue: any;  // RAPIER.EventQueue
+  private collidedPairs: Set<string>;  // Track which pairs have collided
 
   constructor() {
     console.log('PhysicsWorld constructor called');
@@ -42,6 +43,7 @@ export class PhysicsWorld {
     this.joints = new Map();
     this.nextObjectId = 1;
     this.nextJointId = 1;
+    this.collidedPairs = new Set();  // Initialize empty set
   }
 
   async init() {
@@ -79,7 +81,7 @@ export class PhysicsWorld {
       
       // Initialize the physics world with gravity
       console.log('Creating physics world with gravity...');
-      this.world = new this.RAPIER.World({ x: 0.0, y: 30.0 });
+      this.world = new this.RAPIER.World({ x: 0.0, y: 980.0 });  // Standard gravity (roughly 9.8 m/s^2 * 100 for pixel scale)
 
       // Log available methods on the world object
       console.log('World methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(this.world)));
@@ -92,15 +94,6 @@ export class PhysicsWorld {
       });
 
       console.log('Physics world created successfully');
-
-      // Create initial ground
-      this.createObject({
-        type: 'static',
-        position: { x: 0, y: 0 },
-        shape: 'rectangle',
-        size: { width: 100, height: 2 }
-      });
-
       console.log('Physics initialization completed successfully');
       return true;
     } catch (error: any) {
@@ -128,8 +121,8 @@ export class PhysicsWorld {
       default:
         rigidBodyDesc = this.RAPIER.RigidBodyDesc.dynamic();
         // Add damping to reduce energy over time
-        rigidBodyDesc.setLinearDamping(0.3);  // Controls sliding friction
-        rigidBodyDesc.setAngularDamping(0.4); // Controls rotational friction
+        rigidBodyDesc.setLinearDamping(0.1);  // Reduced linear damping for more natural motion
+        rigidBodyDesc.setAngularDamping(0.8); // Keep high angular damping to reduce wobbling
         break;
     }
 
@@ -298,8 +291,8 @@ export class PhysicsWorld {
           jointData = this.RAPIER.JointData.revolute(anchor1, anchor2);
           
           // Set angle limits (in radians)
-          const minAngle = -Math.PI / 4;  // -45 degrees
-          const maxAngle = Math.PI / 4;   // +45 degrees
+          const minAngle = -Math.PI / 8;  // -22.5 degrees
+          const maxAngle = Math.PI / 8;   // +22.5 degrees
           jointData.limitsEnabled = true;
           jointData.limits = [minAngle, maxAngle];
           
@@ -391,10 +384,10 @@ export class PhysicsWorld {
     };
   }
 
-  step(deltaTime: number = 1/60): void {
+  step(deltaTime: number = 1/60, maxSubsteps: number = 1): void {
     if (this.world) {
-      // Step the physics simulation with the given timestep
-      this.world.step(this.eventQueue);
+      // Use the provided timestep and maxSubsteps
+      this.world.step(this.eventQueue, deltaTime, maxSubsteps);
 
       // Process collision events
       this.eventQueue.drainCollisionEvents((handle1: number, handle2: number, started: boolean) => {
@@ -403,68 +396,30 @@ export class PhysicsWorld {
         const obj2 = Array.from(this.objects.entries()).find(([_, obj]) => obj.collider.handle === handle2);
         
         if (obj1 && obj2) {
-          console.log('Collision Event:', {
-            type: started ? 'started' : 'ended',
-            object1: {
-              id: obj1[0],
-              type: obj1[1].params.type,
-              position: obj1[1].rigidBody.translation()
-            },
-            object2: {
-              id: obj2[0],
-              type: obj2[1].params.type,
-              position: obj2[1].rigidBody.translation()
-            }
-          });
-        } else {
-          console.log('Collision Event with unknown objects:', {
-            handle1,
-            handle2,
-            started,
-            foundObj1: !!obj1,
-            foundObj2: !!obj2
-          });
+          // Create a unique key for this pair of objects (order-independent)
+          const id1 = obj1[0];
+          const id2 = obj2[0];
+          const pairKey = [id1, id2].sort().join('-');
+
+          // Only log if this is a new collision that's starting
+          if (started && !this.collidedPairs.has(pairKey)) {
+            this.collidedPairs.add(pairKey);
+            console.log('First Collision Between Objects:', {
+              object1: {
+                id: id1,
+                type: obj1[1].params.type
+              },
+              object2: {
+                id: id2,
+                type: obj2[1].params.type
+              }
+            });
+          }
         }
       });
 
-      // Process contact force events
-      this.eventQueue.drainContactForceEvents((event: any) => {
-        const handle1 = event.collider1();
-        const handle2 = event.collider2();
-        
-        // Find the objects involved in the contact
-        const obj1 = Array.from(this.objects.entries()).find(([_, obj]) => obj.collider.handle === handle1);
-        const obj2 = Array.from(this.objects.entries()).find(([_, obj]) => obj.collider.handle === handle2);
-        
-        if (obj1 && obj2) {
-          console.log('Contact Force Event:', {
-            object1: {
-              id: obj1[0],
-              type: obj1[1].params.type,
-              position: obj1[1].rigidBody.translation()
-            },
-            object2: {
-              id: obj2[0],
-              type: obj2[1].params.type,
-              position: obj2[1].rigidBody.translation()
-            },
-            totalForce: event.totalForce ? event.totalForce() : 'N/A'
-          });
-        } else {
-          console.log('Contact Force Event with unknown objects:', {
-            handle1,
-            handle2,
-            foundObj1: !!obj1,
-            foundObj2: !!obj2
-          });
-        }
-      });
-
-      // Apply multiple substeps for better stability
-      const numSubsteps = 1;
-      for (let i = 0; i < numSubsteps; i++) {
-        this.world.step(this.eventQueue);
-      }
+      // Drain contact force events without processing to clear the queue
+      this.eventQueue.drainContactForceEvents(() => {});
     }
   }
 

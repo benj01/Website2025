@@ -66,49 +66,44 @@ async function init() {
     // Create ground
     objectManager.createObject({
       type: PhysicsObjectType.STATIC,
-      position: { x: 0, y: 100 },
+      position: { x: 300, y: 500 },  // Centered horizontally
       shape: 'rectangle',
-      size: { width: 800, height: 10 },
-      friction: 1.5,  // Higher friction for the ground
-      frictionCombineRule: 'max',  // Use maximum friction when colliding
-      enableCollisionEvents: true,  // Enable collision events
-      enableContactForceEvents: true  // Enable contact force events
+      size: { width: 600, height: 10 },  // Slightly smaller width
+      friction: 3.0,
+      frictionCombineRule: 'max',
+      restitution: 0.0,
+      restitutionCombineRule: 'min',
+      enableCollisionEvents: true,
+      enableContactForceEvents: false
     });
 
     // Create letter L
     console.log('Creating letter L...');
-    const letterParts = letterLoader.createLetter('L', { x: 0, y: 0 });
+    const letterParts = letterLoader.createLetter('L', { x: 300, y: 100 });  // Centered horizontally
     console.log('Letter parts created:', letterParts);
 
     // Track last update time for fixed timestep
     let lastTime = performance.now();
-    const fixedTimeStep = 1/240; // Physics at 240Hz
-    const maxSubSteps = 5;
+    const fixedTimeStep = 1/120;  // Run physics at 120Hz for smoother simulation
+    const maxSubSteps = 4;  // Fewer substeps but more frequent updates
     let accumulator = 0;
 
     // Game loop
     function gameLoop() {
       const currentTime = performance.now();
-      let deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
+      const deltaTime = Math.min((currentTime - lastTime) / 1000, 0.1); // Cap at 100ms
       lastTime = currentTime;
 
-      // Prevent spiral of death
-      if (deltaTime > 0.25) {
-        deltaTime = 0.25;
-      }
-
-      // Accumulate time to step
       accumulator += deltaTime;
-
-      // Step physics multiple times if needed to catch up
-      let numSteps = 0;
-      while (accumulator >= fixedTimeStep && numSteps < maxSubSteps) {
-        objectManager.step(fixedTimeStep);
+      
+      while (accumulator >= fixedTimeStep) {
+        physics.step(fixedTimeStep, maxSubSteps);
         accumulator -= fixedTimeStep;
-        numSteps++;
       }
 
-      // Request next frame
+      // Update visual representations
+      objectManager.sync();
+
       requestAnimationFrame(gameLoop);
     }
 
