@@ -9,8 +9,8 @@
           "height": 50
         },
         "position": {
-          "x": 0,
-          "y": 0
+          "x": 5,
+          "y": 25
         },
         "type": "dynamic",
         "color": "0xcccccc"
@@ -23,8 +23,8 @@
           "height": 10
         },
         "position": {
-          "x": 15,
-          "y": 40
+          "x": 25,
+          "y": 45
         },
         "type": "dynamic",
         "color": "0xcccccc"
@@ -32,11 +32,11 @@
     ],
     "joints": [
       {
-        "type": "fixed",
+        "type": "revolute",
         "between": ["vertical", "horizontal"],
         "anchor": {
           "x": 5,
-          "y": 40
+          "y": 45
         },
         "breakForce": 1000,
         "collideConnected": false

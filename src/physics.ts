@@ -11,16 +11,29 @@ export interface PhysicsObjectParams {
   size?: { width: number; height: number } | { radius: number };
 }
 
+export interface JointParams {
+  type: 'fixed' | 'revolute' | 'prismatic';
+  bodyA: number;  // ID of first body
+  bodyB: number;  // ID of second body
+  anchor: { x: number; y: number };  // World space anchor point
+  breakForce?: number;  // Force required to break the joint
+  collideConnected?: boolean;  // Whether connected bodies should collide
+}
+
 export class PhysicsWorld {
   private world: any;
   private RAPIER: any;
   private objects: Map<number, any>;
+  private joints: Map<number, any>;
   private nextObjectId: number;
+  private nextJointId: number;
 
   constructor() {
     console.log('PhysicsWorld constructor called');
     this.objects = new Map();
+    this.joints = new Map();
     this.nextObjectId = 1;
+    this.nextJointId = 1;
   }
 
   async init() {
@@ -34,6 +47,16 @@ export class PhysicsWorld {
           version: this.RAPIER.version(),
           available: Object.keys(this.RAPIER)
         });
+
+        // Log available joint-related classes
+        console.log('Joint APIs available:', {
+          JointData: !!this.RAPIER.JointData,
+          Vector2: !!this.RAPIER.Vector2,
+          'JointData.fixed': !!this.RAPIER.JointData?.fixed,
+          'JointData.revolute': !!this.RAPIER.JointData?.revolute,
+          'JointData.prismatic': !!this.RAPIER.JointData?.prismatic
+        });
+
       } catch (importError: any) {
         console.error('Failed to import Rapier.js:', {
           name: importError?.name,
@@ -46,6 +69,17 @@ export class PhysicsWorld {
       // Initialize the physics world with gravity
       console.log('Creating physics world with gravity...');
       this.world = new this.RAPIER.World({ x: 0.0, y: 30.0 });
+
+      // Log available methods on the world object
+      console.log('World methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(this.world)));
+      
+      // Verify joint-related methods exist
+      console.log('Joint-related methods available:', {
+        createJoint: !!this.world.createJoint,
+        removeJoint: !!this.world.removeJoint,
+        createImpulseJoint: !!this.world.createImpulseJoint
+      });
+
       console.log('Physics world created successfully');
 
       // Create initial ground
@@ -113,9 +147,125 @@ export class PhysicsWorld {
     return id;
   }
 
+  createJoint(params: JointParams): number {
+    console.log('Creating joint with params:', params);
+    const bodyA = this.objects.get(params.bodyA)?.rigidBody;
+    const bodyB = this.objects.get(params.bodyB)?.rigidBody;
+
+    if (!bodyA || !bodyB) {
+      console.error('Joint creation failed: Invalid body IDs', {
+        bodyAId: params.bodyA,
+        bodyBId: params.bodyB,
+        bodyAExists: !!bodyA,
+        bodyBExists: !!bodyB
+      });
+      throw new Error('Invalid body IDs for joint creation');
+    }
+
+    console.log('Bodies found for joint:', {
+      bodyA: bodyA.handle,
+      bodyB: bodyB.handle
+    });
+
+    try {
+      // Convert world space anchor to local space for each body
+      const bodyAPos = bodyA.translation();
+      const bodyBPos = bodyB.translation();
+      
+      const anchor1 = new this.RAPIER.Vector2(
+        params.anchor.x - bodyAPos.x,
+        params.anchor.y - bodyAPos.y
+      );
+      
+      const anchor2 = new this.RAPIER.Vector2(
+        params.anchor.x - bodyBPos.x,
+        params.anchor.y - bodyBPos.y
+      );
+
+      // Create the joint data
+      let jointData;
+      switch (params.type) {
+        case 'fixed':
+          console.log('Creating fixed joint at:', params.anchor);
+          jointData = this.RAPIER.JointData.fixed(
+            anchor1,
+            0,  // frame1
+            anchor2,
+            0   // frame2
+          );
+          break;
+        case 'revolute':
+          console.log('Creating revolute joint at:', params.anchor);
+          jointData = this.RAPIER.JointData.revolute(
+            anchor1,
+            anchor2
+          );
+          break;
+        case 'prismatic':
+          console.log('Creating prismatic joint at:', params.anchor);
+          const axis = new this.RAPIER.Vector2(1.0, 0.0);
+          jointData = this.RAPIER.JointData.prismatic(
+            anchor1,
+            anchor2,
+            axis
+          );
+          break;
+        default:
+          throw new Error(`Unsupported joint type: ${params.type}`);
+      }
+
+      console.log('Joint data created:', jointData);
+
+      // Create the joint in the physics world
+      const handle = this.world.createImpulseJoint(jointData, bodyA, bodyB, true);
+      console.log('Joint added to world:', handle);
+
+      const id = this.nextJointId++;
+      this.joints.set(id, {
+        handle,
+        params,
+        bodyAId: params.bodyA,
+        bodyBId: params.bodyB
+      });
+
+      return id;
+    } catch (error) {
+      console.error('Failed to create joint:', {
+        error,
+        type: params.type,
+        anchor: params.anchor,
+        bodyA: bodyA?.handle,
+        bodyB: bodyB?.handle
+      });
+      throw error;
+    }
+  }
+
+  removeJoint(id: number): boolean {
+    const joint = this.joints.get(id);
+    if (!joint) return false;
+
+    try {
+      // Remove the joint using the world's impulseJoints
+      this.world.removeImpulseJoint(joint.handle, true); // true to wake up the bodies
+      this.joints.delete(id);
+      return true;
+    } catch (error) {
+      console.error('Failed to remove joint:', error);
+      return false;
+    }
+  }
+
   removeObject(id: number): boolean {
     const object = this.objects.get(id);
     if (!object) return false;
+
+    // Remove any joints connected to this object
+    for (const [jointId, joint] of this.joints) {
+      if (joint.bodyAId === id || joint.bodyBId === id) {
+        this.removeJoint(jointId);
+      }
+    }
 
     // Remove from physics world
     this.world.removeRigidBody(object.rigidBody);

@@ -3,12 +3,19 @@ import { Renderer } from './render';
 
 // Unique identifier for game objects
 type ObjectId = string;
+type JointId = string;
 
 // Types of physics objects we can create
 export enum PhysicsObjectType {
   DYNAMIC = 'dynamic',
   STATIC = 'static',
   KINEMATIC = 'kinematic'
+}
+
+export enum JointType {
+  FIXED = 'fixed',
+  REVOLUTE = 'revolute',
+  PRISMATIC = 'prismatic'
 }
 
 // Base interface for object creation parameters
@@ -21,6 +28,16 @@ export interface ObjectCreateParams {
   color?: number;
 }
 
+export interface JointCreateParams {
+  id?: JointId;
+  type: JointType;
+  bodyA: ObjectId;
+  bodyB: ObjectId;
+  anchor: { x: number; y: number };
+  breakForce?: number;
+  collideConnected?: boolean;
+}
+
 export class ObjectManager {
   private physicsWorld: PhysicsWorld;
   private renderer: Renderer;
@@ -28,17 +45,29 @@ export class ObjectManager {
     physicsId: number;
     rendererId: number;
   }>;
+  private joints: Map<JointId, {
+    physicsJointId: number;
+    bodyA: ObjectId;
+    bodyB: ObjectId;
+  }>;
   private nextId: number;
+  private nextJointId: number;
 
   constructor(physicsWorld: PhysicsWorld, renderer: Renderer) {
     this.physicsWorld = physicsWorld;
     this.renderer = renderer;
     this.objects = new Map();
+    this.joints = new Map();
     this.nextId = 1;
+    this.nextJointId = 1;
   }
 
   private generateId(): ObjectId {
     return `obj_${this.nextId++}`;
+  }
+
+  private generateJointId(): JointId {
+    return `joint_${this.nextJointId++}`;
   }
 
   /**
@@ -60,7 +89,8 @@ export class ObjectManager {
       type: params.type,
       position: params.position,
       shape: params.shape,
-      size: params.size
+      size: params.size,
+      color: params.color
     });
 
     // Store the mapping
@@ -73,11 +103,61 @@ export class ObjectManager {
   }
 
   /**
+   * Creates a joint between two objects
+   */
+  public createJoint(params: JointCreateParams): JointId {
+    const id = params.id || this.generateJointId();
+    
+    const bodyAObj = this.objects.get(params.bodyA);
+    const bodyBObj = this.objects.get(params.bodyB);
+    
+    if (!bodyAObj || !bodyBObj) {
+      throw new Error('Invalid object IDs for joint creation');
+    }
+
+    const physicsJointId = this.physicsWorld.createJoint({
+      type: params.type,
+      bodyA: bodyAObj.physicsId,
+      bodyB: bodyBObj.physicsId,
+      anchor: params.anchor,
+      breakForce: params.breakForce,
+      collideConnected: params.collideConnected
+    });
+
+    this.joints.set(id, {
+      physicsJointId,
+      bodyA: params.bodyA,
+      bodyB: params.bodyB
+    });
+
+    return id;
+  }
+
+  /**
+   * Removes a joint between objects
+   */
+  public removeJoint(id: JointId): boolean {
+    const joint = this.joints.get(id);
+    if (!joint) return false;
+
+    this.physicsWorld.removeJoint(joint.physicsJointId);
+    this.joints.delete(id);
+    return true;
+  }
+
+  /**
    * Removes an object and its representations from both physics and rendering
    */
   public removeObject(id: ObjectId): boolean {
     const object = this.objects.get(id);
     if (!object) return false;
+
+    // Remove any joints connected to this object
+    for (const [jointId, joint] of this.joints) {
+      if (joint.bodyA === id || joint.bodyB === id) {
+        this.removeJoint(jointId);
+      }
+    }
 
     // Remove from physics and rendering
     this.physicsWorld.removeObject(object.physicsId);
