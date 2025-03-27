@@ -16,6 +16,8 @@ async function initRenderer() {
   console.log('[Renderer] Starting initialization...');
   try {
     const renderer = new Renderer();
+    // Wait for the renderer to be fully initialized
+    await new Promise(resolve => setTimeout(resolve, 100)); // Give time for PIXI initialization
     console.log('[Renderer] Initialization successful');
     return renderer;
   } catch (error) {
