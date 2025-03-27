@@ -1,127 +1,47 @@
-Project Description: Interactive Physics-Based Website with Rapier.js & Pixi.js
-1. Project Overview
-The goal of this project is to transform a traditional text-based website into an interactive, physics-driven scene where every letter and graphical element behaves like a dynamic object. This means letters will be decomposed into physical shapes connected by joints, allowing real-time interactions such as breaking connections, applying forces, or responding to gravity.
+# Physics Game with Rapier.js and Pixi.js
 
-2. Technology Stack
-Component	Technology
-Physics Engine	Rapier.js (for 2D physics simulation)
-Rendering Engine	Pixi.js (GPU-accelerated WebGL-based 2D rendering)
-Web Development	HTML, JavaScript, JSON (for storing structure)
-Animation & Interaction	Rapier.js + Custom Events
-3. Features & Functionality
-3.1. Text Decomposition into Physics Objects
-Each letter is decomposed into a set of rigid bodies.
+A simple physics simulation using Rapier.js for physics and Pixi.js for rendering.
 
-Connections between these bodies are established using joints.
+## Prerequisites
 
-Example:
+- Node.js (v16 or higher)
+- npm or yarn
 
-The letter "L" consists of two blocks connected by a joint at the bottom-left.
+## Setup
 
-On user interaction, the joint can be released, causing the horizontal part to fall.
+1. Install dependencies:
+```bash
+npm install
+```
 
-3.2. Physics-Driven Interactions
-Letters and images react dynamically to user interactions.
+2. Start the development server:
+```bash
+npm run dev
+```
 
-Possible interactions:
+3. Build for production:
+```bash
+npm run build
+```
 
-Mouse click/touch: Remove constraints or apply force.
+## Project Structure
 
-Drag & Drop: Move objects around.
+- `src/main.ts` - Main entry point that initializes the application
+- `src/physics.ts` - Physics world setup using Rapier.js
+- `src/render.ts` - Rendering setup using Pixi.js
+- `src/index.html` - HTML entry point
 
-Gravity Toggle: Enable/disable gravity for floating effects.
+## Features
 
-Collisions: Letters bump into each other naturally.
+- 2D physics simulation with gravity
+- Real-time rendering
+- Responsive canvas that adapts to window size
+- Modern async/await WebAssembly loading
+- TypeScript support
 
-3.3. Structured Data Storage (JSON)
-To make the system modular and reusable, two JSON files will be used:
+## Technologies Used
 
-Website Structure JSON
-
-Stores website elements (text, images) and their positions.
-
-Example:
-
-json
-Kopieren
-Bearbeiten
-{
-  "elements": [
-    {
-      "type": "text",
-      "content": "Hello",
-      "position": { "x": 100, "y": 50 }
-    },
-    {
-      "type": "image",
-      "src": "logo.png",
-      "position": { "x": 200, "y": 100 }
-    }
-  ]
-}
-Letter Composition JSON
-
-Defines how each letter is built using relative shapes and joints.
-
-Example for letter "L":
-
-json
-Kopieren
-Bearbeiten
-{
-  "L": {
-    "parts": [
-      { "shape": "rectangle", "size": [10, 50], "position": [0, 0] },
-      { "shape": "rectangle", "size": [30, 10], "position": [5, 40] }
-    ],
-    "joints": [
-      { "type": "fixed", "between": [0, 1], "position": [5, 40] }
-    ]
-  }
-}
-3.4. Rendering with Pixi.js
-Convert text and images into interactive objects.
-
-Draw each physics object with appropriate textures, colors, and effects.
-
-Synchronize rendering with Rapier physics updates.
-
-4. Implementation Plan
-Phase 1: Initial Setup
-Set up Pixi.js rendering.
-
-Integrate Rapier.js for physics simulation.
-
-Load and parse JSON data.
-
-Phase 2: Object Construction
-Convert text characters into physics objects.
-
-Implement joint constraints for letters.
-
-Phase 3: User Interaction
-Add mouse/touch interactions.
-
-Implement dynamic constraints (e.g., breaking joints).
-
-Add realistic physics effects.
-
-Phase 4: Optimization & Styling
-Improve performance with Pixi.js optimizations.
-
-Add visual effects (shadows, textures, animations).
-
-Phase 5: Final Testing & Deployment
-Ensure smooth performance across devices.
-
-Deploy as an interactive website.
-
-5. Potential Expansions
-3D Support: Extend to a Three.js + Rapier.js version.
-
-Sound Effects: Add impact & interaction sounds.
-
-Mobile Support: Optimize for touchscreen interactions.
-
-6. Summary
-This project will transform a traditional website into an interactive playground, where every text and graphic element becomes part of a dynamic physics simulation. Using Rapier.js for physics and Pixi.js for rendering, the system will create a visually engaging experience where letters can fall, break apart, and collide naturally.
+- Vite
+- TypeScript
+- Rapier.js (v0.15.0)
+- Pixi.js (v8.9.0)

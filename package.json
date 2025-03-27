@@ -1,32 +1,20 @@
 {
-  "name": "website2025",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "physics-game",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc && vite build",
     "preview": "vite preview"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/benj01/Website2025.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/benj01/Website2025/issues"
-  },
-  "homepage": "https://github.com/benj01/Website2025#readme",
   "dependencies": {
-    "@dimforge/rapier2d-compat": "^0.15.0",
-    "pixi.js": "^8.9.0",
-    "vite-plugin-top-level-await": "^1.5.0",
-    "vite-plugin-wasm": "^3.4.1"
+    "@dimforge/rapier2d": "0.15.0",
+    "pixi.js": "8.9.0"
   },
   "devDependencies": {
-    "vite": "^5.1.4"
+    "typescript": "^5.2.2",
+    "vite": "^6.2.3",
+    "vite-plugin-wasm": "^3.4.1"
   }
 }
