@@ -1,5 +1,7 @@
 import { PhysicsWorld } from './physics';
 import { Renderer } from './render';
+import { ObjectManager, PhysicsObjectType } from './object-manager';
+import { LetterLoader } from './letter-loader';
 
 async function initPhysics() {
   console.log('[Physics] Starting initialization...');
@@ -54,14 +56,53 @@ async function init() {
 
     console.log('Both physics and renderer initialized successfully');
 
+    // Create object manager
+    const objectManager = new ObjectManager(physics, renderer);
+
+    // Create letter loader
+    const letterLoader = new LetterLoader(objectManager);
+    await letterLoader.loadLetterData();
+
+    // Create ground
+    objectManager.createObject({
+      type: PhysicsObjectType.STATIC,
+      position: { x: 0, y: 100 },
+      shape: 'rectangle',
+      size: { width: 800, height: 10 }
+    });
+
+    // Create letter L
+    console.log('Creating letter L...');
+    const letterParts = letterLoader.createLetter('L', { x: 0, y: 0 });
+    console.log('Letter parts created:', letterParts);
+
+    // Track last update time for fixed timestep
+    let lastTime = performance.now();
+    const fixedTimeStep = 1/240; // Physics at 240Hz
+    const maxSubSteps = 5;
+    let accumulator = 0;
+
     // Game loop
     function gameLoop() {
-      // Step physics
-      physics.step();
+      const currentTime = performance.now();
+      let deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
+      lastTime = currentTime;
 
-      // Update ball position
-      const ballPos = physics.getBallPosition();
-      renderer.updateBallPosition(ballPos.x, ballPos.y);
+      // Prevent spiral of death
+      if (deltaTime > 0.25) {
+        deltaTime = 0.25;
+      }
+
+      // Accumulate time to step
+      accumulator += deltaTime;
+
+      // Step physics multiple times if needed to catch up
+      let numSteps = 0;
+      while (accumulator >= fixedTimeStep && numSteps < maxSubSteps) {
+        objectManager.step(fixedTimeStep);
+        accumulator -= fixedTimeStep;
+        numSteps++;
+      }
 
       // Request next frame
       requestAnimationFrame(gameLoop);

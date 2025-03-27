@@ -1,0 +1,58 @@
+{
+  "L": {
+    "parts": [
+      {
+        "id": "vertical",
+        "shape": "rectangle",
+        "size": {
+          "width": 10,
+          "height": 50
+        },
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "type": "dynamic",
+        "color": "0xcccccc"
+      },
+      {
+        "id": "horizontal",
+        "shape": "rectangle",
+        "size": {
+          "width": 30,
+          "height": 10
+        },
+        "position": {
+          "x": 15,
+          "y": 40
+        },
+        "type": "dynamic",
+        "color": "0xcccccc"
+      }
+    ],
+    "joints": [
+      {
+        "type": "fixed",
+        "between": ["vertical", "horizontal"],
+        "anchor": {
+          "x": 5,
+          "y": 40
+        },
+        "breakForce": 1000,
+        "collideConnected": false
+      }
+    ],
+    "metadata": {
+      "width": 40,
+      "height": 50,
+      "baseline": 45,
+      "description": {
+        "width": "Total width of the letter",
+        "height": "Total height of the letter",
+        "baseline": "Distance from top where the letter sits on the line",
+        "breakForce": "Force required to break the joint",
+        "collideConnected": "Whether the connected bodies should collide"
+      }
+    }
+  }
+} 
