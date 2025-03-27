@@ -19,7 +19,7 @@ export class PhysicsWorld {
         console.log('Attempting to import Rapier.js...');
         this.RAPIER = await import('@dimforge/rapier2d');
         console.log('Rapier.js module loaded successfully:', {
-          version: this.RAPIER.version,
+          version: this.RAPIER.version(),
           available: Object.keys(this.RAPIER)
         });
       } catch (importError: any) {
